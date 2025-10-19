@@ -10,7 +10,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'News App',
       routerConfig: router,
-
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
       themeMode: ThemeMode.system,
