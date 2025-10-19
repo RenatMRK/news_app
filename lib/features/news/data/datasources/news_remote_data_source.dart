@@ -1,9 +1,9 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
+import 'package:news_app/core/network/api_client.dart';
 import 'package:news_app/features/news/data/dto/news_article_dto.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 
+/// Абстрактный источник данных для новостей
 abstract class INewsRemoteDataSource {
   Future<List<NewsArticleDto>> fetchTopHeadlines({
     required NewsCategory category,
@@ -15,10 +15,22 @@ abstract class INewsRemoteDataSource {
 
 /// Реализация remote data source через NewsAPI.org
 class NewsRemoteDataSourceImpl implements INewsRemoteDataSource {
-  final http.Client httpClient;
+  final ApiClient httpClient;
   final String apiKey;
 
-  const NewsRemoteDataSourceImpl({
+  /// Логгер (один на весь источник)
+  final Logger _logger = Logger(
+    printer: PrettyPrinter(
+      methodCount: 0,
+      errorMethodCount: 3,
+      lineLength: 100,
+      colors: true,
+      printEmojis: true,
+      printTime: false,
+    ),
+  );
+
+  NewsRemoteDataSourceImpl({
     required this.httpClient,
     required this.apiKey,
   });
@@ -32,31 +44,40 @@ class NewsRemoteDataSourceImpl implements INewsRemoteDataSource {
     int page = 1,
     int pageSize = 20,
   }) async {
-    final uri = Uri.parse(_baseUrl).replace(queryParameters: {
+    // 🔹 Собираем query-параметры
+    final queryParams = {
       'apiKey': apiKey,
       'category': category.name,
       'country': country,
       'page': page.toString(),
       'pageSize': pageSize.toString(),
-    });
+    };
 
-    final response = await httpClient.get(uri);
+    _logger.i('🌍 [REQUEST] $_baseUrl\nParams: $queryParams');
 
-    if (response.statusCode != 200) {
-      throw Exception('Ошибка при запросе: ${response.statusCode}');
+    // 🔹 Делаем запрос через абстракцию
+    final response = await httpClient.get(_baseUrl, query: queryParams);
+
+    // 🔹 Проверяем статус
+    if (response['status'] != 'ok') {
+      _logger.e('⚠️ Ошибка API: ${response['message']}');
+      throw Exception('Ошибка API: ${response['message']}');
     }
 
-    final jsonBody = jsonDecode(response.body) as Map<String, dynamic>;
-    if (jsonBody['status'] != 'ok') {
-      throw Exception('Ошибка API: ${jsonBody['message']}');
+    final articlesJson = response['articles'] as List<dynamic>;
+    _logger.i('📰 Получено статей: ${articlesJson.length}');
+
+    // 🔹 Пример первой статьи
+    if (articlesJson.isNotEmpty) {
+      final preview = articlesJson.first;
+      _logger.d('🧩 Пример первой статьи: ${preview.toString().substring(0, 300)}...');
     }
 
-    final articlesJson = jsonBody['articles'] as List<dynamic>;
-
-    return articlesJson.map((json) {
+    // 🔹 Преобразуем в DTO
+    final result = articlesJson.map((json) {
       final map = json as Map<String, dynamic>;
       return NewsArticleDto(
-        id: map['url'] ?? '', 
+        id: map['url'] ?? '',
         title: map['title'] ?? '',
         summary: map['description'],
         url: map['url'] ?? '',
@@ -67,5 +88,8 @@ class NewsRemoteDataSourceImpl implements INewsRemoteDataSource {
         category: category.name,
       );
     }).toList();
+
+    _logger.i('✅ [SUCCESS] DTO готов (${result.length} элементов)');
+    return result;
   }
 }

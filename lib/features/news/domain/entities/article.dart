@@ -5,6 +5,7 @@ class NewsArticle extends Equatable {
   final String id;
   final String title;
   final String? summary;
+  final String? content; // ✅ добавлено поле основного текста
   final Uri url;
   final Uri? imageUrl;
   final DateTime publishedAt;
@@ -20,6 +21,7 @@ class NewsArticle extends Equatable {
     required this.source,
     required this.category,
     this.summary,
+    this.content,
     this.imageUrl,
     this.author,
   });
@@ -28,6 +30,7 @@ class NewsArticle extends Equatable {
     String? id,
     String? title,
     String? summary,
+    String? content,
     Uri? url,
     Uri? imageUrl,
     DateTime? publishedAt,
@@ -39,6 +42,7 @@ class NewsArticle extends Equatable {
       id: id ?? this.id,
       title: title ?? this.title,
       summary: summary ?? this.summary,
+      content: content ?? this.content,
       url: url ?? this.url,
       imageUrl: imageUrl ?? this.imageUrl,
       publishedAt: publishedAt ?? this.publishedAt,
@@ -50,19 +54,20 @@ class NewsArticle extends Equatable {
 
   @override
   List<Object?> get props => [
-    id,
-    title,
-    summary,
-    url,
-    imageUrl,
-    publishedAt,
-    source,
-    author,
-    category,
-  ];
+        id,
+        title,
+        summary,
+        content,
+        url,
+        imageUrl,
+        publishedAt,
+        source,
+        author,
+        category,
+      ];
 }
 
-/// 🏷 Value Object: источник новости
+/// 🏷 Источник новости
 class NewsSource extends Equatable {
   final String? id;
   final String name;
@@ -86,5 +91,6 @@ enum NewsCategory {
   sports,
   technology,
 }
+
 
 //ad5bf4b1609e4315b6d5f17cfe28138e

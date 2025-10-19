@@ -8,11 +8,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'News App',
+      debugShowCheckedModeBanner: false, 
+      // title: '🗞️ News App',
       routerConfig: router,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.system, 
     );
   }
 }

@@ -1,17 +1,18 @@
 import 'package:equatable/equatable.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 
-/// DTO для новостной статьи в слое данных
+/// DTO для новостной статьи в data-слое
 class NewsArticleDto extends Equatable {
   final String id;
   final String title;
   final String? summary;
+  final String? content; // ✅ основной текст статьи
   final String url;
   final String? imageUrl;
-  final String publishedAt; // Используем String для JSON-сериализации
+  final String publishedAt;
   final NewsSourceDto source;
   final String? author;
-  final String category; // Используем String для JSON-сериализации
+  final String category;
 
   const NewsArticleDto({
     required this.id,
@@ -21,31 +22,34 @@ class NewsArticleDto extends Equatable {
     required this.source,
     required this.category,
     this.summary,
+    this.content,
     this.imageUrl,
     this.author,
   });
 
-  /// Создание DTO из JSON
+  /// Создание DTO из JSON ответа API
   factory NewsArticleDto.fromJson(Map<String, dynamic> json) {
     return NewsArticleDto(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      summary: json['summary'] as String?,
-      url: json['url'] as String,
-      imageUrl: json['imageUrl'] as String?,
-      publishedAt: json['publishedAt'] as String,
-      source: NewsSourceDto.fromJson(json['source'] as Map<String, dynamic>),
-      author: json['author'] as String?,
-      category: json['category'] as String,
+      id: json['url'] ?? '', // NewsAPI не возвращает отдельный id
+      title: json['title'] ?? '',
+      summary: json['description'],
+      content: json['content'], // ✅ короткий текст контента
+      url: json['url'] ?? '',
+      imageUrl: json['urlToImage'],
+      publishedAt: json['publishedAt'] ?? DateTime.now().toIso8601String(),
+      source: NewsSourceDto.fromJson(json['source'] ?? {}),
+      author: json['author'],
+      category: json['category'] ?? '',
     );
   }
 
-  /// Преобразование DTO в JSON
+  /// Конвертация DTO → JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
       'summary': summary,
+      'content': content,
       'url': url,
       'imageUrl': imageUrl,
       'publishedAt': publishedAt,
@@ -55,12 +59,13 @@ class NewsArticleDto extends Equatable {
     };
   }
 
-  /// Маппинг DTO в доменную модель NewsArticle
+  /// Преобразование DTO в доменную модель NewsArticle
   NewsArticle toDomain() {
     return NewsArticle(
       id: id,
       title: title,
       summary: summary,
+      content: content, // ✅ передаём в domain
       url: Uri.parse(url),
       imageUrl: imageUrl != null ? Uri.parse(imageUrl!) : null,
       publishedAt: DateTime.parse(publishedAt),
@@ -88,7 +93,7 @@ class NewsArticleDto extends Equatable {
       case 'technology':
         return NewsCategory.technology;
       default:
-        return NewsCategory.general; // Значение по умолчанию
+        return NewsCategory.general;
     }
   }
 
@@ -97,6 +102,7 @@ class NewsArticleDto extends Equatable {
         id,
         title,
         summary,
+        content,
         url,
         imageUrl,
         publishedAt,
@@ -113,28 +119,19 @@ class NewsSourceDto extends Equatable {
 
   const NewsSourceDto({this.id, required this.name});
 
-  /// Создание DTO из JSON
   factory NewsSourceDto.fromJson(Map<String, dynamic> json) {
     return NewsSourceDto(
       id: json['id'] as String?,
-      name: json['name'] as String,
+      name: json['name'] as String? ?? 'Неизвестный источник',
     );
   }
 
-  /// Преобразование DTO в JSON
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-    };
+    return {'id': id, 'name': name};
   }
 
-  /// Маппинг DTO в доменную модель NewsSource
   NewsSource toDomain() {
-    return NewsSource(
-      id: id,
-      name: name,
-    );
+    return NewsSource(id: id, name: name);
   }
 
   @override
