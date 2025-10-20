@@ -1,4 +1,3 @@
-
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
@@ -7,7 +6,6 @@ import 'package:news_app/features/news/domain/usecases/get_news.dart';
 part 'news_event.dart';
 part 'news_state.dart';
 
-/// 🧠 BLoC для загрузки новостей
 class NewsBloc extends Bloc<NewsEvent, NewsState> {
   final GetNews getNews;
 
@@ -15,10 +13,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
     on<LoadNewsEvent>(_onLoadNews);
   }
 
-  Future<void> _onLoadNews(
-    LoadNewsEvent event,
-    Emitter<NewsState> emit,
-  ) async {
+  Future<void> _onLoadNews(LoadNewsEvent event, Emitter<NewsState> emit) async {
     emit(NewsLoading());
 
     try {
@@ -28,6 +23,7 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
           country: event.country,
           page: event.page,
           pageSize: event.pageSize,
+          query: event.query,
         ),
       );
 

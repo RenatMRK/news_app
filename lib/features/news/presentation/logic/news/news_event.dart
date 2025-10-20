@@ -1,7 +1,5 @@
 part of 'news_bloc.dart';
 
-
-/// 🔹 События BLoC (что может происходить)
 abstract class NewsEvent extends Equatable {
   const NewsEvent();
 
@@ -9,20 +7,21 @@ abstract class NewsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Загрузить новости по категории
 class LoadNewsEvent extends NewsEvent {
   final NewsCategory category;
   final String country;
   final int page;
   final int pageSize;
+  final String? query;
 
   const LoadNewsEvent({
     required this.category,
     this.country = 'us',
     this.page = 1,
     this.pageSize = 20,
+    this.query,
   });
 
   @override
-  List<Object?> get props => [category, country, page, pageSize];
+  List<Object?> get props => [category, country, page, pageSize, query];
 }

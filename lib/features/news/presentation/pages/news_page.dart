@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:news_app/common/constants/app_icons.dart';
+import 'package:news_app/common/extensions/media_query_values.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/presentation/logic/news/news_bloc.dart';
-import 'package:news_app/features/news/presentation/pages/widgets/build_category_selector_widget.dart';
-import 'package:news_app/features/news/presentation/pages/widgets/news_list_widget.dart';
+import 'package:news_app/features/news/presentation/widgets/build_category_selector_widget.dart';
+import 'package:news_app/features/news/presentation/widgets/news_list_widget.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -24,6 +25,8 @@ class _NewsScreenState extends State<NewsScreen> {
     NewsCategory.sports,
     NewsCategory.technology,
   ];
+
+
 
   final ValueNotifier<NewsCategory> selectedCategory = ValueNotifier(
     NewsCategory.business,
@@ -49,13 +52,34 @@ class _NewsScreenState extends State<NewsScreen> {
     super.dispose();
   }
 
+void _onSearchPressed() async {
+  final result = await showSearch<String>(
+    context: context,
+    delegate: _NewsSearchDelegate(
+      onQuerySelected: (query) {
+        context.read<NewsBloc>().add(
+          LoadNewsEvent(
+            category: selectedCategory.value,
+            query: query,
+          ),
+        );
+      },
+    ),
+  );
+
+  if (result != null && result.isNotEmpty) {
+    context.read<NewsBloc>().add(
+      LoadNewsEvent(category: selectedCategory.value, query: result),
+    );
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: SvgPicture.asset(AppIcons.search),
-          onPressed: () {},
+          onPressed:  _onSearchPressed,
         ),
       ),
       body: Column(
@@ -72,7 +96,7 @@ class _NewsScreenState extends State<NewsScreen> {
               );
             },
           ),
-          const SizedBox(height: 8),
+           SizedBox(height: context.scaleH(10)),
           Expanded(
             child: BlocBuilder<NewsBloc, NewsState>(
               builder: (context, state) {
@@ -91,6 +115,54 @@ class _NewsScreenState extends State<NewsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _NewsSearchDelegate extends SearchDelegate<String> {
+  final void Function(String query) onQuerySelected;
+
+  _NewsSearchDelegate({required this.onQuerySelected});
+
+  @override
+  String get searchFieldLabel => 'Поиск новостей...';
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      if (query.isNotEmpty)
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () => query = '',
+        ),
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => close(context, ''),
+    );
+  }
+
+@override
+Widget buildResults(BuildContext context) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    onQuerySelected(query);
+    close(context, query); 
+  });
+
+  return const SizedBox.shrink();
+}
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return Center(
+      child: Text(
+        query.isEmpty
+            ? 'Введите запрос для поиска'
+            : 'Нажмите Enter, чтобы искать "$query"',
       ),
     );
   }

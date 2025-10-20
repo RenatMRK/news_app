@@ -10,13 +10,10 @@ abstract class NewsState extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Состояние по умолчанию
 class NewsInitial extends NewsState {}
 
-/// Новости загружаются
 class NewsLoading extends NewsState {}
 
-/// Новости успешно загружены
 class NewsLoaded extends NewsState {
   final List<NewsArticle> articles;
 
@@ -26,7 +23,6 @@ class NewsLoaded extends NewsState {
   List<Object?> get props => [articles];
 }
 
-/// Произошла ошибка
 class NewsError extends NewsState {
   final String message;
 

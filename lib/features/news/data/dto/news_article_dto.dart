@@ -1,12 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 
-/// DTO для новостной статьи в data-слое
 class NewsArticleDto extends Equatable {
   final String id;
   final String title;
   final String? summary;
-  final String? content; // ✅ основной текст статьи
+  final String? content; 
   final String url;
   final String? imageUrl;
   final String publishedAt;
@@ -27,13 +26,12 @@ class NewsArticleDto extends Equatable {
     this.author,
   });
 
-  /// Создание DTO из JSON ответа API
   factory NewsArticleDto.fromJson(Map<String, dynamic> json) {
     return NewsArticleDto(
-      id: json['url'] ?? '', // NewsAPI не возвращает отдельный id
+      id: json['url'] ?? '', 
       title: json['title'] ?? '',
       summary: json['description'],
-      content: json['content'], // ✅ короткий текст контента
+      content: json['content'], 
       url: json['url'] ?? '',
       imageUrl: json['urlToImage'],
       publishedAt: json['publishedAt'] ?? DateTime.now().toIso8601String(),
@@ -43,7 +41,6 @@ class NewsArticleDto extends Equatable {
     );
   }
 
-  /// Конвертация DTO → JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -59,13 +56,12 @@ class NewsArticleDto extends Equatable {
     };
   }
 
-  /// Преобразование DTO в доменную модель NewsArticle
   NewsArticle toDomain() {
     return NewsArticle(
       id: id,
       title: title,
       summary: summary,
-      content: content, // ✅ передаём в domain
+      content: content, 
       url: Uri.parse(url),
       imageUrl: imageUrl != null ? Uri.parse(imageUrl!) : null,
       publishedAt: DateTime.parse(publishedAt),
@@ -75,7 +71,6 @@ class NewsArticleDto extends Equatable {
     );
   }
 
-  /// Маппинг строки категории в enum NewsCategory
   NewsCategory _mapStringToCategory(String category) {
     switch (category.toLowerCase()) {
       case 'business':
@@ -112,7 +107,6 @@ class NewsArticleDto extends Equatable {
       ];
 }
 
-/// DTO для источника новости
 class NewsSourceDto extends Equatable {
   final String? id;
   final String name;

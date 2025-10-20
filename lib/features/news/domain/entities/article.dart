@@ -1,11 +1,10 @@
 import 'package:equatable/equatable.dart';
 
-/// 📰 Domain Entity: новостная статья
 class NewsArticle extends Equatable {
   final String id;
   final String title;
   final String? summary;
-  final String? content; // ✅ добавлено поле основного текста
+  final String? content; 
   final Uri url;
   final Uri? imageUrl;
   final DateTime publishedAt;
@@ -67,7 +66,6 @@ class NewsArticle extends Equatable {
       ];
 }
 
-/// 🏷 Источник новости
 class NewsSource extends Equatable {
   final String? id;
   final String name;
@@ -81,7 +79,6 @@ class NewsSource extends Equatable {
   List<Object?> get props => [id, name];
 }
 
-/// 🔖 Категории новостей
 enum NewsCategory {
   business,
   entertainment,
@@ -93,4 +90,3 @@ enum NewsCategory {
 }
 
 
-//ad5bf4b1609e4315b6d5f17cfe28138e

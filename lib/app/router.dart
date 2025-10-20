@@ -12,21 +12,18 @@ final GoRouter router = GoRouter(
     ShellRoute(
       builder: (context, state, child) => ScaffoldWithBottomNav(child: child),
       routes: [
-        // ✅ News tab
         GoRoute(
           path: AppRoutes.news,
           name: AppRoutes.newsName,
           builder: (context, state) => const NewsScreen(),
         ),
 
-        // ✅ Favorites tab
         GoRoute(
           path: AppRoutes.favorites,
           name: AppRoutes.favoritesName,
           builder: (context, state) => const FavoritesScreen(),
         ),
 
-        // ✅ Detail screen
         GoRoute(
           path: AppRoutes.newsDetail,
           name: AppRoutes.newsDetailName,
