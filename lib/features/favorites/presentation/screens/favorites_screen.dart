@@ -4,7 +4,7 @@ import 'package:news_app/app/di/di.dart';
 import 'package:news_app/features/favorites/presentation/logic/favorites_list_bloc.dart';
 import 'package:news_app/features/favorites/presentation/logic/favorites_list_event.dart';
 import 'package:news_app/features/favorites/presentation/logic/favorites_list_state.dart';
-import 'package:news_app/features/news/presentation/widgets/news_list_widget.dart';
+import 'package:news_app/features/shared/widgets/news_list_widget.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});

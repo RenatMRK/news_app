@@ -6,7 +6,7 @@ import 'package:news_app/common/extensions/media_query_values.dart';
 import 'package:news_app/features/news/domain/entities/article.dart';
 import 'package:news_app/features/news/presentation/logic/news/news_bloc.dart';
 import 'package:news_app/features/news/presentation/widgets/build_category_selector_widget.dart';
-import 'package:news_app/features/news/presentation/widgets/news_list_widget.dart';
+import 'package:news_app/features/shared/widgets/news_list_widget.dart';
 
 class NewsScreen extends StatefulWidget {
   const NewsScreen({super.key});
@@ -25,8 +25,6 @@ class _NewsScreenState extends State<NewsScreen> {
     NewsCategory.sports,
     NewsCategory.technology,
   ];
-
-
 
   final ValueNotifier<NewsCategory> selectedCategory = ValueNotifier(
     NewsCategory.business,
@@ -58,14 +56,13 @@ void _onSearchPressed() async {
     delegate: _NewsSearchDelegate(
       onQuerySelected: (query) {
         context.read<NewsBloc>().add(
-          LoadNewsEvent(
-            category: selectedCategory.value,
-            query: query,
-          ),
+          LoadNewsEvent(category: selectedCategory.value, query: query),
         );
       },
     ),
   );
+
+  if (!mounted) return;
 
   if (result != null && result.isNotEmpty) {
     context.read<NewsBloc>().add(
@@ -73,13 +70,16 @@ void _onSearchPressed() async {
     );
   }
 }
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: scheme.onPrimary,
         leading: IconButton(
           icon: SvgPicture.asset(AppIcons.search),
-          onPressed:  _onSearchPressed,
+          onPressed: _onSearchPressed,
         ),
       ),
       body: Column(
@@ -96,17 +96,14 @@ void _onSearchPressed() async {
               );
             },
           ),
-           SizedBox(height: context.scaleH(10)),
+          SizedBox(height: context.scaleH(10)),
           Expanded(
             child: BlocBuilder<NewsBloc, NewsState>(
               builder: (context, state) {
                 if (state is NewsLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is NewsLoaded) {
-                  return NewsListWidget(
-                    articles: state.articles,
-             
-                  );
+                  return NewsListWidget(articles: state.articles);
                 } else if (state is NewsError) {
                   return Center(child: Text('Ошибка: ${state.message}'));
                 }
@@ -132,10 +129,7 @@ class _NewsSearchDelegate extends SearchDelegate<String> {
   List<Widget>? buildActions(BuildContext context) {
     return [
       if (query.isNotEmpty)
-        IconButton(
-          icon: const Icon(Icons.clear),
-          onPressed: () => query = '',
-        ),
+        IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
     ];
   }
 
@@ -147,15 +141,16 @@ class _NewsSearchDelegate extends SearchDelegate<String> {
     );
   }
 
-@override
-Widget buildResults(BuildContext context) {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    onQuerySelected(query);
-    close(context, query); 
-  });
+  @override
+  Widget buildResults(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      onQuerySelected(query);
+      close(context, query);
+    });
 
-  return const SizedBox.shrink();
-}
+    return const SizedBox.shrink();
+  }
+
   @override
   Widget buildSuggestions(BuildContext context) {
     return Center(

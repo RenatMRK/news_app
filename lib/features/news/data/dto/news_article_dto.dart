@@ -5,7 +5,7 @@ class NewsArticleDto extends Equatable {
   final String id;
   final String title;
   final String? summary;
-  final String? content; 
+  final String? content;
   final String url;
   final String? imageUrl;
   final String publishedAt;
@@ -26,71 +26,32 @@ class NewsArticleDto extends Equatable {
     this.author,
   });
 
-  factory NewsArticleDto.fromJson(Map<String, dynamic> json) {
-    return NewsArticleDto(
-      id: json['url'] ?? '', 
-      title: json['title'] ?? '',
-      summary: json['description'],
-      content: json['content'], 
-      url: json['url'] ?? '',
-      imageUrl: json['urlToImage'],
-      publishedAt: json['publishedAt'] ?? DateTime.now().toIso8601String(),
-      source: NewsSourceDto.fromJson(json['source'] ?? {}),
-      author: json['author'],
-      category: json['category'] ?? '',
-    );
-  }
+  factory NewsArticleDto.fromJson(Map<String, dynamic> json) => NewsArticleDto(
+        id: json['url'] ?? '',
+        title: json['title'] ?? '',
+        summary: json['description'],
+        content: json['content'],
+        url: json['url'] ?? '',
+        imageUrl: json['urlToImage'],
+        publishedAt:
+            json['publishedAt'] ?? DateTime.now().toIso8601String(),
+        source: NewsSourceDto.fromJson(json['source'] ?? {}),
+        author: json['author'],
+        category: json['category'] ?? '',
+      );
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'summary': summary,
-      'content': content,
-      'url': url,
-      'imageUrl': imageUrl,
-      'publishedAt': publishedAt,
-      'source': source.toJson(),
-      'author': author,
-      'category': category,
-    };
-  }
-
-  NewsArticle toDomain() {
-    return NewsArticle(
-      id: id,
-      title: title,
-      summary: summary,
-      content: content, 
-      url: Uri.parse(url),
-      imageUrl: imageUrl != null ? Uri.parse(imageUrl!) : null,
-      publishedAt: DateTime.parse(publishedAt),
-      source: source.toDomain(),
-      author: author,
-      category: _mapStringToCategory(category),
-    );
-  }
-
-  NewsCategory _mapStringToCategory(String category) {
-    switch (category.toLowerCase()) {
-      case 'business':
-        return NewsCategory.business;
-      case 'entertainment':
-        return NewsCategory.entertainment;
-      case 'general':
-        return NewsCategory.general;
-      case 'health':
-        return NewsCategory.health;
-      case 'science':
-        return NewsCategory.science;
-      case 'sports':
-        return NewsCategory.sports;
-      case 'technology':
-        return NewsCategory.technology;
-      default:
-        return NewsCategory.general;
-    }
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'summary': summary,
+        'content': content,
+        'url': url,
+        'imageUrl': imageUrl,
+        'publishedAt': publishedAt,
+        'source': source.toJson(),
+        'author': author,
+        'category': category,
+      };
 
   @override
   List<Object?> get props => [

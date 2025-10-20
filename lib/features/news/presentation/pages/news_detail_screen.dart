@@ -18,30 +18,35 @@ class NewsDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final contentToShow =
+        (article.content != null && article.content!.trim().isNotEmpty)
+        ? article.content
+        : article.summary;
 
     return BlocProvider(
       create: (_) => sl<FavoritesBloc>()..add(CheckFavoriteEvent(article.id)),
       child: BlocBuilder<FavoritesBloc, FavoritesState>(
         builder: (context, state) {
-          final isFavorite =
-              state is FavoriteStatusChanged ? state.isFavorite : false;
-
+          final isFavorite = state is FavoriteStatusChanged
+              ? state.isFavorite
+              : false;
           return Scaffold(
             appBar: AppBar(
+              surfaceTintColor: scheme.onPrimary,
               leading: IconButton(
                 onPressed: () => context.pop(),
-                icon: const Icon(Icons.arrow_back, size: 36),
+                icon: Icon(Icons.arrow_back, size: 36, color: scheme.outline),
               ),
               actions: [
                 IconButton(
                   onPressed: () {
-                    context
-                        .read<FavoritesBloc>()
-                        .add(ToggleFavoriteEvent(article));
+                    context.read<FavoritesBloc>().add(
+                      ToggleFavoriteEvent(article),
+                    );
                   },
                   icon: Icon(
                     isFavorite ? Icons.star : Icons.star_border,
-                    color: scheme.outlineVariant,
+                    color: scheme.outline,
                     size: 38,
                   ),
                 ),
@@ -52,27 +57,27 @@ class NewsDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 📰 Заголовок
                   Text(
                     article.title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: context.scaleSp(33),
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                  const SizedBox(height: 8),
-
-                  // 📄 Краткое описание
+                  SizedBox(height: context.scaleH(8)),
                   if (article.summary != null)
                     Text(
                       article.summary!,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(color: Colors.grey[700]),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: context.scaleSp(27),
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
-
-                  // 👤 Автор + дата
+                  SizedBox(height: context.scaleH(24)),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -82,22 +87,25 @@ class NewsDetailScreen extends StatelessWidget {
                             article.author!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(color: Colors.grey[700]),
+                            style: TextStyle(
+                              fontSize: context.scaleSp(19),
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                       Text(
                         _formatPublishedAt(article.publishedAt),
-                        style: const TextStyle(color: Colors.grey),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: context.scaleSp(19),
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 16),
-
-                  // 🖼 Фото
+                  SizedBox(height: context.scaleH(10)),
                   if (article.imageUrl != null)
                     ClipRRect(
                       borderRadius: BorderRadius.circular(27),
@@ -109,13 +117,15 @@ class NewsDetailScreen extends StatelessWidget {
                       ),
                     ),
 
-                  const SizedBox(height: 16),
+                  SizedBox(height: context.scaleH(10)),
 
-                  // 📜 Основной контент
-                  if (article.content != null)
+                  if (contentToShow != null && contentToShow.trim().isNotEmpty)
                     Text(
-                      article.content!,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      contentToShow,
+                      style: TextStyle(
+                        fontSize: context.scaleSp(26),
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                 ],
               ),
@@ -126,4 +136,3 @@ class NewsDetailScreen extends StatelessWidget {
     );
   }
 }
-

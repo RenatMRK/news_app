@@ -79,12 +79,15 @@ class CustomBottomNavBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
+              blurRadius: 6.1,
+              offset: const Offset(0, 3),
             ),
           ],
-          border: Border.all(color: theme.colorScheme.outlineVariant,width: context.scaleW(0.5)),
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant,
+            width: context.scaleW(0.5),
+          ),
         ),
         child: Row(
           children: List.generate(items.length, (i) {
